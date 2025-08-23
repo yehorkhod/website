@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+:root {
+  --base: #232136;
+  --surface: #2a273f;
+  --overlay: #393552;
+  --muted: #6e6a86;
+  --subtle: #908caa;
+  --text: #e0def4;
+  --love: #eb6f92;
+  --gold: #f6c177;
+  --rose: #ea9a97;
+  --pine: #3e8fb0;
+  --foam: #9ccfd8;
+  --iris: #c4a7e7;
+  --highlight-low: #2a283e;
+  --highlight-med: #44415a;
+  --highlight-high: #56526e;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------------------------------------------------------- */
+/* ----------------------- Status bar ----------------------- */
+/* ---------------------------------------------------------- */
+#status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--overlay);
+  padding: 6px 12px;
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  border-radius: 4px;
+}
+
+/* ----------------------- Left part ------------------------ */
+#status-left nav {
+  display: flex;
+  gap: 4px;
+}
+
+#status-left a {
+  text-decoration: none;
+  color: var(--subtle);
+  padding: 2px 6px;
+  border-radius: 3px;
+  transition: background 0.2s, color 0.2s;
+}
+
+#status-left a:hover {
+  color: var(--text);
+}
+
+#status-left a.active {
+  color: var(--rose);
+}
+
+#status-left a.active:hover {
+  color: var(--love);
+}
+
+/* ----------------------- Right part ----------------------- */
+#status-right {
+  display: flex;
+  align-items: center;
+  color: var(--subtle);
+  gap: 6px;
+}
+
+#status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pine);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+#home {
+  margin-top: 12px;
+  border: 1px solid var(--overlay);
+  border-radius: 4px;
+  background: var(--surface);
+  padding: 16px 18px;
+  font-family: 'VT323', monospace;
+  color: var(--text);
+  height: calc(100vh - 24px);
+}
