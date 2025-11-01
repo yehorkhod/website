@@ -3,5 +3,7 @@
 /build
 erl_crash.dump
 .env
+.env*
 .start.sh
 .github/
+.aider*

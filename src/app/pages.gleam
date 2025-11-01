@@ -1,110 +1,78 @@
+import gleam/list
+
+import simplifile
+import wisp
+
 import nakai
-import nakai/attr
-import nakai/html.{type Node}
-import wisp.{type Response}
-
-pub fn home() -> Response {
-  let main: Node =
-    html.main([attr.id("home")], [
-      html.h1_text([], "Sweet home"),
-    ])
-  let header: Node = header("/")
-  template(main, header)
+import nakai/attr.{href, rel, src}
+import nakai/html.{
+  type Node, Body, Doctype, Head, Html, Script, a_text, h1_text, header, link,
+  main, nav, title,
 }
 
-pub fn blog() -> Response {
-  let main: Node =
-    html.main([], [
-      html.div(
-        [
-          attr.id("loadding"),
-          attr.Attr("hx-get", "/api/blog"),
-          attr.Attr("hx-trigger", "load"),
-          attr.Attr("hx-target", "this"),
-          attr.Attr("hx-swap", "outerHTML"),
-        ],
-        [],
-      ),
-    ])
-  let header: Node = header("/blog")
-  template(main, header)
+import app/parse.{md_to_html}
+
+pub fn home() {
+  [h1_text([], "welcome")]
+  |> response
 }
 
-pub fn single_post(id: String) -> Response {
-  let main: Node =
-    html.main([], [
-      html.div(
-        [
-          attr.id("loadding"),
-          attr.Attr("hx-get", "/api/blog/" <> id),
-          attr.Attr("hx-trigger", "load"),
-          attr.Attr("hx-target", "this"),
-          attr.Attr("hx-swap", "outerHTML"),
-        ],
-        [],
-      ),
-    ])
-  let header: Node = header("")
-  template(main, header)
+pub fn blog() {
+  let assert Ok(blogs) = simplifile.read_directory("blog")
+  blogs
+  |> list.map(fn(x) { a_text([href("/blog/" <> x)], x) })
+  |> nav([], _)
+  |> list.wrap
+  |> response
 }
 
-fn template(main: Node, header: Node) -> Response {
-  html.Html([], [
-    html.Doctype("html"),
-    html.Head([
-      html.title("Yehor Khodysko - Blog - Shop"),
-      html.link([attr.rel("stylesheet"), attr.href("/static/style.css")]),
-      html.Script(
+pub fn blog_id(id) {
+  let assert Ok(contents) = simplifile.read("blog/" <> id)
+  contents |> md_to_html |> response
+}
+
+fn response(contents: List(Node)) {
+  Html([], [
+    Doctype("html"),
+    Head([
+      title("Yehor Khodysko - Blog"),
+      link([rel("stylesheet"), href("/static/style.css")]),
+      // Prism.js
+      link([
+        rel("stylesheet"),
+        href(
+          "https://cdn.jsdelivr.net/gh/rose-pine/prism/dist/prism-rose-pine-moon.css",
+        ),
+      ]),
+      Script([src("https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.js")], ""),
+      Script(
         [
-          attr.src(
-            "https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js",
+          src(
+            "https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js",
           ),
-          attr.integrity(
-            "sha384-Akqfrbj/HpNVo8k11SXBb6TlBWmXXlYQrCSqEWmyKJe+hDm3Z/B2WVG4smwBkRVm",
-          ),
-          attr.crossorigin("anonymous"),
         ],
         "",
       ),
+      Script(
+        [
+          src(
+            "https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-nix.min.js",
+          ),
+        ],
+        "",
+      ),
+      Script([src("https://unpkg.com/prismjs-gleam@1/gleam.js")], ""),
     ]),
-    html.Body([], [
-      header,
-      main,
+    Body([], [
+      header([], [
+        nav([], [
+          a_text([attr.href("/")], "[0] home"),
+          a_text([attr.href("/blog")], "[1] blog"),
+        ]),
+      ]),
+      main([], contents),
     ]),
   ])
   |> nakai.to_inline_string_tree
   |> wisp.html_response(200)
-}
-
-fn header(page: String) -> Node {
-  let nav: Node =
-    html.nav([], case page {
-      "/" -> [
-        html.a_text([attr.class("active"), attr.href("/")], "[0] ~"),
-        html.a_text([attr.href("/blog")], "[1] ~/blog"),
-        html.a_text([attr.href("/shop")], "[2] ~/shop"),
-      ]
-      "/blog" -> [
-        html.a_text([attr.href("/")], "[0] ~"),
-        html.a_text([attr.class("active"), attr.href("/blog")], "[1] ~/blog"),
-        html.a_text([attr.href("/shop")], "[2] ~/shop"),
-      ]
-      "/shop" -> [
-        html.a_text([attr.href("/")], "[0] ~"),
-        html.a_text([attr.href("/blog")], "[1] ~/blog"),
-        html.a_text([attr.class("active"), attr.href("/shop")], "[2] ~/shop"),
-      ]
-      _ -> [
-        html.a_text([attr.href("/")], "[0] ~"),
-        html.a_text([attr.href("/blog")], "[1] ~/blog"),
-        html.a_text([attr.href("/shop")], "[2] ~/shop"),
-      ]
-    })
-  html.header([attr.id("status-bar")], [
-    html.div([attr.id("status-left")], [nav]),
-    html.div([attr.id("status-right")], [
-      html.span([attr.id("status-indicator")], []),
-      html.Text("online"),
-    ]),
-  ])
 }
