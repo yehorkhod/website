@@ -24,17 +24,30 @@ fn parse(
   case lines {
     [line, ..rest] -> {
       case line, state {
-        // TODO: ---
-        // Headers
+        // Empty line ends a paragraph
+        "", Some(Paragraph) -> parse(rest, "", None, [p_text([], temp), ..acc])
+
+        // Skip empty lines outside any block
+        "", None -> parse(rest, "", None, acc)
+
+        // Headers (Close the paragraph, if one was opened earlier)
+        "#" <> _, Some(Paragraph) ->
+          parse(lines, "", None, [p_text([], temp), ..acc])
+
         "###" <> _, None -> parse(rest, "", None, [h3_text([], line), ..acc])
         "##" <> _, None -> parse(rest, "", None, [h2_text([], line), ..acc])
         "#" <> _, None -> parse(rest, "", None, [h1_text([], line), ..acc])
-        // Code
+
+        // Code blocks (Close the paragraph, if one was opened earlier)
+        "```" <> _, Some(Paragraph) ->
+          parse(lines, "", None, [p_text([], temp), ..acc])
+
         "```" <> language, None ->
           case language {
             "" -> parse(rest, "", Some(Code(None)), acc)
             lang -> parse(rest, "", Some(Code(Some(lang))), acc)
           }
+
         "```", Some(Code(language)) ->
           case language {
             Some(lang) ->
@@ -45,11 +58,12 @@ fn parse(
             None ->
               parse(rest, "", None, [pre([], [code_text([], temp)]), ..acc])
           }
+
         "", Some(Code(_)) -> parse(rest, temp <> "\n", state, acc)
         _, Some(Code(_)) -> parse(rest, temp <> "\n" <> line, state, acc)
+
         // Paragraphs
-        _, None -> parse(rest, temp <> "\n" <> line, Some(Paragraph), acc)
-        "", Some(Paragraph) -> parse(rest, "", None, [p_text([], temp), ..acc])
+        _, None -> parse(rest, line, Some(Paragraph), acc)
         _, Some(Paragraph) -> parse(rest, temp <> " " <> line, state, acc)
       }
     }
