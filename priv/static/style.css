@@ -1,10 +1,75 @@
 @import url('https://cdn.jsdelivr.net/gh/mflorence99/tn3270@master/fonts/3270.css');
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
 
-main {
-    font-family: '3270', monospace;
+/* Body */
+body {
+    font-size: 24px;
+    font-family: '3270 Font', monospace;
 }
 
-code {
-    font-family: 'Fira Code', monospace;
+/* Header */
+header {
+    font-size: 24px;
+    font-family: '3270 Font', monospace;
+    display: flex;
+    justify-content: space-between;
+}
+
+header span {
+    color: #ea9a97
+}
+
+header nav {
+    display: flex;
+    gap: 1rem;
+}
+
+header nav a {
+    text-decoration: none;
+    color: #9ccfd8;
+}
+
+header nav a:hover {
+    color: #3e8fb0;
+}
+
+/* Main */
+main nav {
+    display: flex;
+    flex-direction: column;
+}
+
+main nav a {
+    text-decoration: none;
+    color: #e0def4;
+}
+
+main nav a:hover {
+    color: #eb6f92;
+}
+
+/* Other text */
+h1 {
+    font-size: 24px;
+    color: #c4a7e7;
+}
+h2 {
+    font-size: 24px;
+    color: #9ccfd8;
+}
+h3 {
+    font-size: 24px;
+    color: #ea9a97;
+}
+p {
+    font-size: 24px;
+    color: #e0def4;
+}
+
+/* Code Blocks */
+code { color: #9ccfd8; }
+
+pre code {
+    font-family: 'Fira Code', monospace !important;
+    font-size: 20px;
 }

@@ -1,4 +1,6 @@
 import gleam/list
+import gleam/regexp
+import gleam/string_tree
 
 import simplifile
 import wisp
@@ -7,7 +9,7 @@ import nakai
 import nakai/attr.{href, rel, src}
 import nakai/html.{
   type Node, Body, Doctype, Head, Html, Script, a_text, h1_text, header, link,
-  main, nav, title,
+  main, nav, title, span_text,
 }
 
 import app/parse.{md_to_html}
@@ -65,6 +67,7 @@ fn response(contents: List(Node)) {
     ]),
     Body([], [
       header([], [
+        span_text([], "~/yehorkhod"),
         nav([], [
           a_text([attr.href("/")], "[0] home"),
           a_text([attr.href("/blog")], "[1] blog"),
@@ -73,6 +76,17 @@ fn response(contents: List(Node)) {
       main([], contents),
     ]),
   ])
-  |> nakai.to_inline_string_tree
+  |> nakai.to_inline_string
+  |> minify
+  |> string_tree.from_string
   |> wisp.html_response(200)
+}
+
+fn minify(html: String) -> String {
+  let assert Ok(re_trailing) = regexp.from_string(">\\s+")
+  let assert Ok(re_leading) = regexp.from_string("\\s+<")
+
+  html
+  |> regexp.replace(each: re_trailing, with: ">")
+  |> regexp.replace(each: re_leading, with: "<")
 }
