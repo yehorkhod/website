@@ -22,8 +22,7 @@ pub fn blog() {
   blogs
   |> list.sort(string.compare)
   |> list.reverse
-  |> list.map(string.drop_start(_, 3))
-  |> list.map(fn(x) { a_text([href("/blog/" <> x)], x) })
+  |> list.map(fn(x) { a_text([href("/blog/" <> x)], string.drop_start(x, 3)) })
   |> nav([], _)
   |> list.wrap
   |> response
