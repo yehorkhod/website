@@ -1,16 +1,13 @@
 import gleam/list
 import gleam/regexp
-import gleam/string_tree
-
-import simplifile
-import wisp
-
 import nakai
 import nakai/attr.{href, rel, src}
 import nakai/html.{
   type Node, Body, Doctype, Head, Html, Script, a_text, h1_text, header, link,
-  main, nav, title, span_text,
+  main, nav, span_text, title,
 }
+import simplifile
+import wisp
 
 import app/parse.{md_to_html}
 
@@ -78,7 +75,6 @@ fn response(contents: List(Node)) {
   ])
   |> nakai.to_inline_string
   |> minify
-  |> string_tree.from_string
   |> wisp.html_response(200)
 }
 
