@@ -1,5 +1,6 @@
 import gleam/list
 import gleam/regexp
+import gleam/string
 import nakai
 import nakai/attr.{href, rel, src}
 import nakai/html.{
@@ -19,6 +20,9 @@ pub fn home() {
 pub fn blog() {
   let assert Ok(blogs) = simplifile.read_directory("blog")
   blogs
+  |> list.sort(string.compare)
+  |> list.reverse
+  |> list.map(string.drop_start(_, 3))
   |> list.map(fn(x) { a_text([href("/blog/" <> x)], x) })
   |> nav([], _)
   |> list.wrap
